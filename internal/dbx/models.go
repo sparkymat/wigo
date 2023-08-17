@@ -5,8 +5,21 @@
 package dbx
 
 import (
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 )
+
+type Feed struct {
+	ID            uuid.UUID
+	UserID        uuid.UUID
+	PublicID      string
+	Title         string
+	Description   string
+	Url           string
+	LastFetchedAt pgtype.Timestamp
+	CreatedAt     pgtype.Timestamp
+	UpdatedAt     pgtype.Timestamp
+}
 
 type SchemaMigration struct {
 	Version int64
@@ -14,7 +27,7 @@ type SchemaMigration struct {
 }
 
 type User struct {
-	ID                int64
+	ID                uuid.UUID
 	Name              string
 	Username          string
 	EncryptedPassword string

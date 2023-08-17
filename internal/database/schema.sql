@@ -35,6 +35,23 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
+-- Name: feeds; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.feeds (
+    id uuid NOT NULL,
+    user_id uuid NOT NULL,
+    public_id text NOT NULL,
+    title text DEFAULT ''::text NOT NULL,
+    description text DEFAULT ''::text NOT NULL,
+    url text NOT NULL,
+    last_fetched_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
 -- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -49,7 +66,7 @@ CREATE TABLE public.schema_migrations (
 --
 
 CREATE TABLE public.users (
-    id bigint NOT NULL,
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
     name text NOT NULL,
     username text NOT NULL,
     encrypted_password text NOT NULL,
@@ -59,29 +76,19 @@ CREATE TABLE public.users (
 
 
 --
--- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: feeds feeds_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.users_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
+ALTER TABLE ONLY public.feeds
+    ADD CONSTRAINT feeds_pkey PRIMARY KEY (id);
 
 
 --
--- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: feeds feeds_public_id_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
-
-
---
--- Name: users id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_id_seq'::regclass);
+ALTER TABLE ONLY public.feeds
+    ADD CONSTRAINT feeds_public_id_key UNIQUE (public_id);
 
 
 --
@@ -113,6 +120,14 @@ ALTER TABLE ONLY public.users
 --
 
 CREATE TRIGGER users_updated_at BEFORE UPDATE ON public.users FOR EACH ROW EXECUTE FUNCTION public.moddatetime('updated_at');
+
+
+--
+-- Name: feeds feeds_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.feeds
+    ADD CONSTRAINT feeds_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id);
 
 
 --
